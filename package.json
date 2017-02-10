@@ -31,7 +31,6 @@
     "sinon": "^1.17.6",
     "sinon-chai": "^2.8.0",
     "supertest": "^2.0.1",
-    "supertest-as-promised": "^4.0.0",
     "webpack-dev-middleware": "^1.10.0"
   },
   "dependencies": {
@@ -51,6 +50,7 @@
     "body-parser": "^1.15.2",
     "bunyan": "^1.8.5",
     "bunyan-middleware": "^0.6.0",
+    "bunyan-logstash-tcp": "^0.3.5",
     "connect-history-api-fallback": "^1.3.0",
     "cross-env": "^2.0.1",
     "css-loader": "^0.25.0",
