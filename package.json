@@ -8,7 +8,9 @@
     "build": "npm-run-all clean build:*",
     "build:server": "cross-env NODE_ENV=production babel ./server --out-dir ./lib",
     "build:client": "cross-env NODE_ENV=production webpack",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npm-run-all test:*",
+    "test:server": "mocha --require server/test/setup.js --compilers js:babel-register server/**/*.spec.js",
+    "test-watch:server": "nodemon --exec \"_mocha --require server/test/setup.js --compilers js:babel-register server/**/*.spec.js || true\"",
     "run-dev": "nodemon --exec babel-node -w server  -- server/index.js"
   },
   "devDependencies": {
