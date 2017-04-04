@@ -4,16 +4,15 @@ import config from './config';
 
 const streams = [
   {
-    level: 'info',
     stream: process.stdout,
   },
 ];
 
-if (config.LOGSTASH_HOST) {
+if (config.LOGSTASH_HOSTNAME) {
   streams.push({
     type: 'raw',
     stream: bunyanLogstash.createStream({
-      host: config.LOGSTASH_HOST,
+      host: config.LOGSTASH_HOSTNAME,
       port: config.LOGSTASH_PORT,
     }),
   });
@@ -21,8 +20,8 @@ if (config.LOGSTASH_HOST) {
 
 export default bunyan.createLogger({
   name: config.APP_NAME,
-  level: config.LOG_LEVEL,
   env: config.ENV,
+  level: config.LOG_LEVEL,
 
   streams,
 });

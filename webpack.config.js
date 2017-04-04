@@ -15,8 +15,7 @@
  if (process.env.NODE_ENV === 'production') {
    appEntry = [
      'babel-polyfill',
-     path.join(__dirname,
-     'client/index.js'),
+     path.join(__dirname, 'client/index.js'),
    ];
    devtool = 'source-map';
    plugins = [

@@ -1,27 +1,46 @@
-app:
-  build: .
-  ports:
-    - 3000:3000
-  volumes:
-    - .:/usr/src/app/:rw
-  links:
-    - postgres
-  environment:
-    - NODE_ENV=development
-  # Before you run this file for the first time, make sure
-  # you remove node_modules/ folders in your host machine
-  command: >
-    sh -c '
-    if test -d node_modules;
-    then
-      echo node_modules_exists ;
-    else
-      cp -a /tmp/node_modules /usr/src/app/website;
-    fi &&
-    npm install && npm run run-dev | ./node_modules/.bin/bunyan -o short
-    '
+version: '2'
 
-postgres:
-  image: postgres:9.4.10-alpine
-  ports:
-      - 5432:5432
+services:
+  app:
+    build: .
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/usr/src/app/:rw
+    links:
+      - postgres
+    depends_on:
+      - postgres
+    external_links:
+      - dockerelk_logstash_1:logstash
+    networks:
+      - dockerelk_docker_elk
+      - default
+    tty: true
+    environment:
+      - NODE_ENV=development
+      - LOGSTASH_HOSTNAME=logstash
+      - POSTGRES_URI=postgres://docs_public@postgres/servis
+    # Before you run this file for the first time, make sure
+    # you remove node_modules/ folders in your host machine
+    command: >
+      sh -c '
+      if test -d node_modules;
+      then
+        echo node_modules_exists ;
+      else
+        cp -a /tmp/node_modules /usr/src/app/website;
+      fi &&
+      npm install && npm run run-dev | ./node_modules/.bin/bunyan -o short
+      '
+
+  postgres:
+    image: certhon-db:v1
+    networks:
+      - default
+    ports:
+        - 5432:5432
+
+networks:
+  dockerelk_docker_elk:
+    external: true

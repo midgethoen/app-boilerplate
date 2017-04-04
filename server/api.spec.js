@@ -1,5 +1,5 @@
 import request from 'supertest';
-import api from './';
+import api from './api';
 
 describe('GET /ping', () => {
   it('should respond with pong', async () => {

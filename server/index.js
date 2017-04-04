@@ -4,46 +4,55 @@ import 'babel-polyfill';
 import path from 'path';
 import webpack from 'webpack';
 import express from 'express';
-import WebpackDevMiddleware from 'webpack-dev-middleware';
+import WebpackDevServer from 'webpack-dev-server';
 import historyApiFallback from 'connect-history-api-fallback';
 import bunyanMiddleware from 'bunyan-middleware';
+import Promise from 'bluebird';
 
-
-import webpackConfig from '../webpack.config';
 import config from './config';
 import log from './logger';
 
 import api from './api';
 
-const server = express();
-server.use(bunyanMiddleware({
+Promise.config({ warnings: false });
+global.Promise = Promise;
+
+express.static.mime.define({ 'text/cache-manifest': ['appcache'] });
+
+const logger = bunyanMiddleware({
   logger: log,
   obscureHeaders: ['Authorization'],
   requestStart: true,
-}));
-server.use('/api', api);
+});
 
 if (config.ENV === 'development') {
-  const devServer = new WebpackDevMiddleware(webpack(webpackConfig), {
+  const webpackConfig = require('../webpack.config');
+  const apiServer = express();
+  apiServer.use(logger);
+  apiServer.use('/', api);
+  apiServer.listen(config.API_PORT, () => log.info(`ApiServer is listening on port ${config.API_PORT}`));
+
+  const devServer = new WebpackDevServer(webpack(webpackConfig), {
     contentBase: '/build/',
     proxy: {
       '/api/**': {
-        target: `http://localhost:${config.API.PORT}`,
+        target: `http://localhost:${config.API_PORT}`,
         pathRewrite: { '^/api': '/' },
       },
     },
     stats: { colors: true },
-    noInfo: true,
     hot: true,
     historyApiFallback: true,
   });
-  server.use('/', devServer);
-} else if (config.ENV === 'production') {
+  devServer.use('/', express.static(path.join(__dirname, '../build')));
+  devServer.listen(config.PORT, () => log.info(`Dev-server is listening on port ${config.PORT}`));
+} else {
+  const server = express();
+  server.use('/api', api);
   server.use(historyApiFallback());
+  server.use('/', express.static(
+    path.join(__dirname, '../build'),
+    { dotfiles: 'allow' }
+  ));
+  server.listen(config.PORT, () => log.info(`Server is listening on port ${config.PORT}`));
 }
-
-server.use('/', express.static(path.join(__dirname, '../build')));
-server.listen(
-    config.PORT,
-    () => log.info('Server is listening on port %s', config.PORT)
-  );
