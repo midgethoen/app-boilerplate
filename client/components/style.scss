@@ -1,0 +1,9 @@
+/**********************************************************
+ * Override variables
+ */
+
+$fa-font-path: '~font-awesome/fonts';
+$icon-font-path: '~bootstrap-sass/assets/fonts/bootstrap/';
+@import "~bootstrap-sass/assets/stylesheets/_bootstrap.scss";
+@import "~font-awesome/scss/font-awesome.scss";
+@import "sticky-footer.scss";
